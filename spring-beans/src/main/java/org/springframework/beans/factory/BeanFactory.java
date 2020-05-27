@@ -116,6 +116,7 @@ import org.springframework.lang.Nullable;
 public interface BeanFactory {
 
 	/**
+	 * 对FactoryBean的转义定义,因为如果使用Bean的名字检索FactoryBean得到的对象是工厂生成的对象 如果需要得到工厂本身,需要转义
 	 * Used to dereference a {@link FactoryBean} instance and distinguish it from
 	 * beans <i>created</i> by the FactoryBean. For example, if the bean named
 	 * {@code myJndiObject} is a FactoryBean, getting {@code &myJndiObject}
@@ -125,6 +126,7 @@ public interface BeanFactory {
 
 
 	/**
+	 * 根据bean的名字,获取ioc容器中的bean实例
 	 * Return an instance, which may be shared or independent, of the specified bean.
 	 * <p>This method allows a Spring BeanFactory to be used as a replacement for the
 	 * Singleton or Prototype design pattern. Callers may retain references to
@@ -139,6 +141,7 @@ public interface BeanFactory {
 	Object getBean(String name) throws BeansException;
 
 	/**
+	 * 根据bean的名字和类型获取bean实例,增加了类型安全校验机制
 	 * Return an instance, which may be shared or independent, of the specified bean.
 	 * <p>Behaves the same as {@link #getBean(String)}, but provides a measure of type
 	 * safety by throwing a BeanNotOfRequiredTypeException if the bean is not of the
@@ -212,6 +215,7 @@ public interface BeanFactory {
 
 
 	/**
+	 * 提供对bean的检索,看看再ioc容器中是否有这个名字的bean
 	 * Does this bean factory contain a bean definition or externally registered singleton
 	 * instance with the given name?
 	 * <p>If the given name is an alias, it will be translated back to the corresponding
