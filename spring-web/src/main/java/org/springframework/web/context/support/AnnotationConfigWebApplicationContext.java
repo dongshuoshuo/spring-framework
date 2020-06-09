@@ -16,22 +16,18 @@
 
 package org.springframework.web.context.support;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.annotation.AnnotatedBeanDefinitionReader;
-import org.springframework.context.annotation.AnnotationConfigRegistry;
-import org.springframework.context.annotation.AnnotationConfigUtils;
-import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
-import org.springframework.context.annotation.ScopeMetadataResolver;
+import org.springframework.context.annotation.*;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.ContextLoader;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * {@link org.springframework.web.context.WebApplicationContext WebApplicationContext}
@@ -192,16 +188,19 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 	 */
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) {
+		//设置注解Bean定义读取器
 		AnnotatedBeanDefinitionReader reader = getAnnotatedBeanDefinitionReader(beanFactory);
+		//设置路径Bean扫描器
 		ClassPathBeanDefinitionScanner scanner = getClassPathBeanDefinitionScanner(beanFactory);
-
+		//生成Bean的名称
 		BeanNameGenerator beanNameGenerator = getBeanNameGenerator();
+		//为注解Bean定义读取器和扫描器设置Bean名称生成器
 		if (beanNameGenerator != null) {
 			reader.setBeanNameGenerator(beanNameGenerator);
 			scanner.setBeanNameGenerator(beanNameGenerator);
 			beanFactory.registerSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR, beanNameGenerator);
 		}
-
+		//获取容器的作用域元数据解析器
 		ScopeMetadataResolver scopeMetadataResolver = getScopeMetadataResolver();
 		if (scopeMetadataResolver != null) {
 			reader.setScopeMetadataResolver(scopeMetadataResolver);
@@ -223,11 +222,13 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 			}
 			scanner.scan(StringUtils.toStringArray(this.basePackages));
 		}
-
+		//获取容器定义的Bean定义资源路径
 		String[] configLocations = getConfigLocations();
+		//如果定位的Bean定义资源路径不为空
 		if (configLocations != null) {
 			for (String configLocation : configLocations) {
 				try {
+					//使用当前容器的类加载器加载定位路径的字节码文件
 					Class<?> clazz = ClassUtils.forName(configLocation, getClassLoader());
 					if (logger.isInfoEnabled()) {
 						logger.info("Successfully resolved class for [" + configLocation + "]");
@@ -239,6 +240,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 						logger.debug("Could not load class for config location [" + configLocation +
 								"] - trying package scan. " + ex);
 					}
+					//启动容器类路径扫描器扫描给定路径包及其自爆的类
 					int count = scanner.scan(configLocation);
 					if (logger.isInfoEnabled()) {
 						if (count == 0) {
